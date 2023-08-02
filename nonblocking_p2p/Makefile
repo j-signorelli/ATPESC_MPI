@@ -19,6 +19,9 @@ all: $(BINS)
 stencil: stencil.c $(STENCIL_COMMON_SRC)
 	$(CC) $(STENCIL_CFLAGS) $^ -o $@ -lm
 
+derived_stencil: derived_stencil.c $(STENCIL_COMMON_SRC)
+	$(CC) $(STENCIL_CFLAGS) %^ -o $@ -lm
+
 clean:
 	rm -f $(BINS)
 	rm -f output*tmp
