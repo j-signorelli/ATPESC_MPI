@@ -34,14 +34,19 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &myid);
     MPI_Get_processor_name(processor_name, &namelen);
+    // ^^Processes get their ID/rank and total size
 
-    fprintf(stdout, "Process %d of %d is on %s\n", myid, numprocs, processor_name);
+    fprintf(stdout, "Process %d of %d is on %s\n", myid, numprocs-1, processor_name);
     fflush(stdout);
 
-    n = 10000;  /* default # of rectangles */
+    
     if (myid == 0)
+    {
+	n = 10000;
         startwtime = MPI_Wtime();
+    }
 
+    // Initialize n on all other ranks
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     h = 1.0 / (double) n;
@@ -52,7 +57,7 @@ int main(int argc, char *argv[])
         sum += f(x);
     }
     mypi = h * sum;
-
+    // SUM all mypi's and send result to the pi variable ON RANK 0
     MPI_Reduce(&mypi, &pi, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
     pi *= 4.0;
