@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     
     if (myid == 0)
     {
-	n = 10000;
+	n = 1000000000;
         startwtime = MPI_Wtime();
     }
 
