@@ -22,9 +22,6 @@ stencil: stencil.c $(STENCIL_COMMON_SRC)
 stencil_alltoallw: stencil_alltoallw.c $(STENCIL_COMMON_SRC)
 	$(CC) $(STENCIL_CFLAGS) $^ -o $@ -lm
 
-derived_stencil: derived_stencil.c $(STENCIL_COMMON_SRC)
-        $(CC) $(STENCIL_CFLAGS) $^ -o $@ -lm
-
 clean:
 	rm -f $(BINS)
 	rm -f output*.bmp
