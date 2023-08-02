@@ -65,8 +65,8 @@ int main(int argc, char **argv)
 
     int iter, i;
 
-    //double *sbufnorth, *sbufsouth, *sbufeast, *sbufwest;
-    //double *rbufnorth, *rbufsouth, *rbufeast, *rbufwest;
+    double *sbufnorth, *sbufsouth, *sbufeast, *sbufwest;
+    double *rbufnorth, *rbufsouth, *rbufeast, *rbufwest;
     double *aold, *anew, *tmp;
 
     double heat, rheat;
@@ -140,24 +140,8 @@ int main(int argc, char **argv)
     r refers to receiving buffers, s refers to send buffers
     we want to send arrays that are the size = # of halos on each boundary!
     */
-    //alloc_comm_bufs(bx, by, &sbufnorth, &sbufsouth, &sbufeast, &sbufwest,
-    //                &rbufnorth, &rbufsouth, &rbufeast, &rbufwest);
-    // NOW: we don't want separate data structures! We want to save memory
-
-
-    // Instead, let's define MPI datatypes to transfer only what we care about!
-    MPI_Datatype east;
-    MPI_Datatype west;
-    MPI_Datatype north;
-    MPI_Datatype south;
-
-    //MPI_Type_contiguous(bx, MPI_DOUBLE, north_south);
-    // north and south can be same contiguous array if starting index is in right spot
-    // NOT worth it because we already can control specifically how much is being sent in the data buffer anyways since the data is inline and MPI_DOUBLE, just send buffer count
-
-    // Same thing with north/south as with east/west
-    MPI_Type_vector(by, 1, bx, MPI_DOUBLE, east_west);
-
+    alloc_comm_bufs(bx, by, &sbufnorth, &sbufsouth, &sbufeast, &sbufwest,
+                    &rbufnorth, &rbufsouth, &rbufeast, &rbufwest);
 
     for (iter = 0; iter < niters; ++iter) {
 
@@ -176,18 +160,16 @@ int main(int argc, char **argv)
         // This code below does the following:
         /*
     for (i = 0; i < bx; ++i)
-        sbufnorth[i] = aold[ind(i + 1, 1)]; <-- All the northmost points
+        sbufnorth[i] = aold[ind(i + 1, 1)];
     for (i = 0; i < bx; ++i)
-        sbufsouth[i] = aold[ind(i + 1, by)]; <-- All the southmost points
+        sbufsouth[i] = aold[ind(i + 1, by)];
     for (i = 0; i < by; ++i)
-        sbufeast[i] = aold[ind(bx, i + 1)]; <-- All the eastmost points
+        sbufeast[i] = aold[ind(bx, i + 1)];
     for (i = 0; i < by; ++i)
-        sbufwest[i] = aold[ind(1, i + 1)]; <-- All the westmost points
+        sbufwest[i] = aold[ind(1, i + 1)];
         */
         // ie: LOAD UP THE COMM BUFFERS WITH THE DATA!
-        //pack_data(bx, by, aold, sbufnorth, sbufsouth, sbufeast, sbufwest);
-        // ^Now we don't want to do this either! Save time by not copying!!
-
+        pack_data(bx, by, aold, sbufnorth, sbufsouth, sbufeast, sbufwest);
 
         /* exchange data with neighbors */
         MPI_Isend(sbufnorth, bx, MPI_DOUBLE, north, 9, MPI_COMM_WORLD, &reqs[0]);
